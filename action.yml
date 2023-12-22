@@ -16,6 +16,13 @@ inputs:
   githubToken:
     description: "GitHub Token"
     required: true
+outputs:
+  deploymentId:
+    description: "Deployment ID"
+  deploymentUrl:
+    description: "Deployment URL"
+  environment:
+    description: "Environment string"
 runs:
   using: "node20"
   main: "index.js"

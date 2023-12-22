@@ -80,10 +80,10 @@ async function run() {
     setOutput("environment", environmentString);
 
     // The alias URL is the last domain in the list for production (usually the custom domain), or the branch subdomain for previews
-    const aliasUrl = isProduction ? project.domains[project.domains.length - 1] : `${cfDeployment.deployment_trigger.metadata.branch}.${project.subdomain}`;
+    const aliasUrl = isProduction ? project.domains[project.domains.length - 1] : `https://${cfDeployment.deployment_trigger.metadata.branch}.${project.subdomain}`;
 
     summary.addHeading("Deployed to Cloudflare Pages");
-    summary.addRaw(`<b>Environment</b>:${environmentString}<br>`, true);
+    summary.addRaw(`<b>Environment</b>: ${environmentString}<br>`, true);
 
     summary.addRaw(`<b>Branch URL</b>: `);
     summary.addLink(aliasUrl, aliasUrl);
