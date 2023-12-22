@@ -24,7 +24,9 @@ async function run() {
     const projectName = getInput("projectName", { required: true });
     const directory = getInput("directory", { required: true });
     
-    const ref = isEventType(context, "pull_request") ? context.payload.pull_request.head.ref : context.ref;
+    const ref =
+      isEventType(context, "pull_request") ? context.payload.pull_request.head.ref :
+      isEventType(context, "release") ? context.payload.release.target_commitish : context.ref;
     const sha = isEventType(context, "pull_request") ? context.payload.pull_request.head.sha : context.sha;
     const commitMessage = 
       isEventType(context, "pull_request") ? context.payload.pull_request.title :
@@ -53,6 +55,7 @@ async function run() {
       environment: environmentString,
       required_contexts: [],
       production_environment: isProduction,
+      transient_environment: !isProduction,
     });
 
     if (githubDeployment.status !== 201) throw new Error(`Failed to create Github deployment: ${githubDeployment.status}`);
@@ -80,11 +83,10 @@ async function run() {
     const aliasUrl = isProduction ? project.domains[project.domains.length - 1] : `${cfDeployment.deployment_trigger.metadata.branch}.${project.subdomain}`;
 
     summary.addHeading("Deployed to Cloudflare Pages");
-    summary.addSeparator();
-    summary.addRaw(`**Environment**: ${environmentString}`);
-    summary.addRaw(`**Branch URL**: ${aliasUrl}`);
-    summary.addRaw(`**Deployment ID**: ${cfDeployment.id}`);
-    summary.addRaw(`**Deployment URL**: ${cfDeployment.url}`);
+    summary.addRaw(`<b>Environment</b>: ${environmentString}`, true);
+    summary.addRaw(`<b>Branch URL</b>: ${aliasUrl}`, true);
+    summary.addRaw(`<b>Deployment ID</b>: ${cfDeployment.id}`, true);
+    summary.addRaw(`<b>Deployment URL</b>: ${cfDeployment.url}`, true);
 
     await summary.write();
   } catch (error) {
