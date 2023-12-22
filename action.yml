@@ -1,0 +1,21 @@
+name: "Fast CF Pages Upload"
+description: "Faster upload action for CF Pages because why not"
+inputs:
+  apiToken:
+    description: "Cloudflare API Token"
+    required: true
+  accountId:
+    description: "Cloudflare Account ID"
+    required: true
+  projectName:
+    description: "Pages project name"
+    required: true
+  directory:
+    description: "Directory to upload"
+    required: true
+  githubToken:
+    description: "GitHub Token"
+    required: true
+runs:
+  using: "node20"
+  main: "index.js"
