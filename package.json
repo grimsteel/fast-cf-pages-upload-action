@@ -1,6 +1,6 @@
 {
   "name": "fast-cf-pages-upload-action",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "Faster upload action for CF Pages because why not",
   "main": "index.js",
   "scripts": {
