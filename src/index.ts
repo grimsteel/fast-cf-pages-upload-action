@@ -83,12 +83,40 @@ async function run() {
     const aliasUrl = isProduction ? project.domains[project.domains.length - 1] : `${cfDeployment.deployment_trigger.metadata.branch}.${project.subdomain}`;
 
     summary.addHeading("Deployed to Cloudflare Pages");
-    summary.addRaw(`<b>Environment</b>: ${environmentString}`, true);
-    summary.addRaw(`<b>Branch URL</b>: ${aliasUrl}`, true);
-    summary.addRaw(`<b>Deployment ID</b>: ${cfDeployment.id}`, true);
-    summary.addRaw(`<b>Deployment URL</b>: ${cfDeployment.url}`, true);
+    summary.addRaw(`<b>Environment</b>:${environmentString}<br>`, true);
+
+    summary.addRaw(`<b>Branch URL</b>: `);
+    summary.addLink(aliasUrl, aliasUrl);
+    summary.addRaw(`<br>`, true);
+
+    summary.addRaw(`<b>Deployment ID</b>: ${cfDeployment.id}<br>`, true);
+
+    summary.addRaw(`<b>Deployment URL</b>: `);
+    summary.addLink(cfDeployment.url, cfDeployment.url);
+    summary.addRaw(`<br>`, true);
 
     await summary.write();
+
+    if (isEventType(context, "pull_request")) {
+      // Add a PR comment
+      const existingComments = await octokit.rest.issues.listComments({
+        ...context.repo,
+        issue_number: context.payload.pull_request.number
+      });
+
+      const existingLinkComment = existingComments.data.find(comment => comment.body?.includes(`Sign: ${Buffer.from(ref).toString("base64")}`) && comment.user.type === "Bot");
+      if (!existingLinkComment) {
+        await octokit.rest.issues.createComment({
+          ...context.repo,
+          issue_number: context.payload.pull_request.number,
+          body: `Visit the preview URL for this PR:
+
+[**${aliasUrl}**](${aliasUrl})
+
+<sub>Sign: ${Buffer.from(ref).toString("base64")}</sub>`
+        });
+      }
+    }
   } catch (error) {
     setFailed(error.message);
   }
